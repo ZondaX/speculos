@@ -156,13 +156,14 @@ static void cx_rfc6979_hmacVK(
 /*                                                                         */
 /* ----------------------------------------------------------------------- */
 void cx_rng_rfc6979_init(
-    cx_rnd_rfc6979_ctx_t *rfc_ctx, cx_md_t hash_id, const uint8_t *x,
-    size_t x_len, const uint8_t *h1, size_t h1_len, const uint8_t *q,
-    size_t q_len
+    cx_rnd_rfc6979_ctx_t *rfc_ctx, cx_md_t hash_id,
+    const uint8_t *x, size_t x_len,
+    const uint8_t *h1, size_t h1_len,
+    const uint8_t *q, size_t q_len
     /*const uint8_t *additional_input, size_t additional_input_len*/) {
 
   const cx_hash_info_t *hash_info = cx_hash_get_info(hash_id);
-  if (hash_info == NULL || hash_info->output_size == 0) {
+  if (hash_info == NULL || h1_len == 0) {
     THROW(INVALID_PARAMETER);
   }
 
@@ -171,7 +172,7 @@ void cx_rng_rfc6979_init(
   rfc_ctx->q_len = cx_rfc6979_bitslength(q, q_len);
   rfc_ctx->r_len = (rfc_ctx->q_len + 7) & ~7;
   rfc_ctx->hash_id = hash_id;
-  rfc_ctx->md_len = hash_info->output_size;
+  rfc_ctx->md_len = h1_len;
 
   // STEP A: h1 = HASH(m)
   // input is h1
