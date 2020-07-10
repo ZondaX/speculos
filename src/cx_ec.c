@@ -351,12 +351,18 @@ int sys_cx_eddsa_verify(const cx_ecfp_public_key_t *pu_key,
   if (sig_len != 64) {
     return 0;
   }
-  if (pu_key->curve != CX_CURVE_Ed25519 || pu_key->W_len != 1 + 2 * 32) {
+  if (pu_key->curve != CX_CURVE_Ed25519) {
     return 0;
   }
 
   /* pass a compressed key to ED25519_verify */
   memcpy(&pub, pu_key, sizeof(pub));
+  const uint8_t validPubkey = (pub.W[0] == 0x04 && pu_key->W_len == 1 + 2 * 32) ||
+                              (pub.W[0] == 0x02 && pu_key->W_len == 1 + 32);
+  if (!validPubkey) {
+    return 0;
+  }
+
   if (pub.W[0] == 0x04) {
     if (sys_cx_edward_compress_point(pub.curve, pub.W, pub.W_len) != 0) {
       return 0;
